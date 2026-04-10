@@ -38,7 +38,7 @@ def handle_message(event):
             {"role": "user", "content": text1}
         ],
         model="gpt-5-nano",
-        temperature = 0.8, # 建議稍微調降一點(原本是1)，可以讓語氣更穩定、符合成熟氣質的人設
+        temperature = 1, # 建議稍微調降一點(原本是1)，可以讓語氣更穩定、符合成熟氣質的人設
     )
     
     try:
