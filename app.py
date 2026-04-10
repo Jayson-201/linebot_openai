@@ -12,6 +12,9 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 line_bot_api = LineBotApi(os.getenv('CHANNEL_ACCESS_TOKEN'))
 handler1 = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 
+# 1. 宣告全域變數，初始化計數器
+openai_message_counter = 0
+
 @app.route('/callback', methods=['POST'])
 def callback():
     signature = request.headers['X-Line-Signature']
@@ -24,7 +27,10 @@ def callback():
 
 @handler1.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    text1=event.message.text
+    # 2. 在函式內宣告要修改外層的全域變數
+    global openai_message_counter
+    
+    text1 = event.message.text
     response = openai.ChatCompletion.create(
         messages=[
             {"role": "user", "content": text1}
@@ -32,11 +38,20 @@ def handle_message(event):
         model="gpt-5-nano",
         temperature = 1,
     )
+    
     try:
         ret = response['choices'][0]['message']['content'].strip()
+        
+        # 3. 如果成功取得 OpenAI 的回覆，計數器就 +1
+        openai_message_counter += 1
+        
+        # 4. 將計數器的資訊串接在原本的回覆內容後面
+        ret = f"{ret}\n\n[系統提示] 這是 OpenAI 傳送的第 {openai_message_counter} 則訊息。"
+        
     except:
         ret = '發生錯誤！'
-    line_bot_api.reply_message(event.reply_token,TextSendMessage(text=ret))
+        
+    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=ret))
 
 if __name__ == '__main__':
     app.run()
