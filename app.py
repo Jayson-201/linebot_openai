@@ -33,10 +33,12 @@ def handle_message(event):
     text1 = event.message.text
     response = openai.ChatCompletion.create(
         messages=[
+            # 在這裡加入 system 角色，設定 AI 的個性
+            {"role": "system", "content": "你現在扮演一位溫柔、優雅且充滿智慧的氣質姊姊。你的說話語氣溫婉、體貼、成熟，常常帶有安撫與鼓勵的感覺，請用親切、知性的口吻來回答問題。"},
             {"role": "user", "content": text1}
         ],
         model="gpt-5-nano",
-        temperature = 1,
+        temperature = 0.8, # 建議稍微調降一點(原本是1)，可以讓語氣更穩定、符合成熟氣質的人設
     )
     
     try:
